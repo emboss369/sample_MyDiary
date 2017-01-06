@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/add_diary"
+        android:id="@+id/menu_item_add_diary"
+        android:icon="@drawable/ic_insert_drive_file"
+        app:showAsAction="ifRoom" />
+    <item android:title="@string/delete_all"
+        android:id="@+id/menu_item_delete_all"
+        android:icon="@drawable/ic_delete"
+        app:showAsAction="ifRoom" />
+    <item android:title="@string/start_slide_show"
+        android:id="@+id/menu_item_slide_show"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_collections" />
+    <item android:title="@string/setting"
+        android:id="@+id/menu_item_setting"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_settings" />
+</menu>
