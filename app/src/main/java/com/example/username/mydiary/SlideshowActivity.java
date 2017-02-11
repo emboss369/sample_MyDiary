@@ -1,19 +1,21 @@
-package org.example.username.mydiary;
+package com.example.username.mydiary;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
@@ -32,43 +34,6 @@ import io.realm.RealmResults;
  * status bar and navigation/system bar) with user interaction.
  */
 public class SlideshowActivity extends AppCompatActivity {
-
-    protected static final String SLIDESHOW_WAIT_TIME = "slideshow_wait_time";
-    protected static final String SLIDESHOW_ANIMATION = "slideshow_animation";
-    protected static final String FADE_IN_OUT = "fade_in_out";
-    protected static final String SLIDE_IN = "slide_in";
-    private Realm mRealm;
-
-    private ImageSwitcher mImageSwitcher;
-
-    private int mPosition = 0;
-
-    private ArrayList<Long> mImageIds = new ArrayList<>();
-
-    private boolean mIsSlildeshow = true;
-
-    private class MainTimerTask extends TimerTask {
-
-        @Override
-        public void run() {
-            if (mIsSlildeshow) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        movePositon(1);
-                    }
-                });
-            }
-        }
-    }
-
-    private Timer mTimer;
-    private TimerTask mTimerTask = new MainTimerTask();
-    private Handler mHandler = new Handler();
-
-    MediaPlayer mMediaPlayer;
-
-
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -87,7 +52,51 @@ public class SlideshowActivity extends AppCompatActivity {
      */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    //private View mContentView;
+    private ImageSwitcher mContentView;
+    private Realm mRealm;
+    private ArrayList<Long> mImageIds = new ArrayList<>();
+    private int mPosition = 0;
+
+    private boolean mIsSlildeshow = true;
+    MediaPlayer mMediaPlayer;
+
+
+    private class MainTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            if (mIsSlildeshow) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        movePositon(1);
+                    }
+                });
+            }
+        }
+    }
+
+    private Timer mTimer;
+////    private TimerTask mTimerTask = new MainTimerTask();
+    private Handler mHandler = new Handler();
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mTimer = new Timer();
+        mTimer.schedule(new MainTimerTask(), 0, 5000);
+        if (mIsSlildeshow) mMediaPlayer.start();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mTimer.cancel();
+
+        mMediaPlayer.pause();
+    }
+
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -97,7 +106,7 @@ public class SlideshowActivity extends AppCompatActivity {
             // Note that some of these constants are new as of API 16 (Jelly Bean)
             // and API 19 (KitKat). It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
-            mImageSwitcher.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -129,31 +138,35 @@ public class SlideshowActivity extends AppCompatActivity {
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
-        }
-    };
+    private final View.OnTouchListener mDelayHideTouchListener =
+            new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    if (AUTO_HIDE) {
+                        delayedHide(AUTO_HIDE_DELAY_MILLIS);
+                    }
+                    return false;
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_slideshow);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
-
-        // イメージスイッチャー
-        mImageSwitcher = (ImageSwitcher) findViewById(R.id.image_switcher);
+        //mContentView = findViewById(R.id.fullscreen_content);
+        mContentView = (ImageSwitcher) findViewById(R.id.image_switcher);//追加
 
 
         // Set up the user interaction to manually show or hide the system UI.
-        mImageSwitcher.setOnClickListener(new View.OnClickListener() {
+        mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 toggle();
@@ -163,53 +176,32 @@ public class SlideshowActivity extends AppCompatActivity {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.sildeshow_button).setOnTouchListener(mDelayHideTouchListener);
+        findViewById(R.id.slideshow_button)
+                .setOnTouchListener(mDelayHideTouchListener);    //編集
 
-        // realm初期処理
+        // 以下追加
         mRealm = Realm.getDefaultInstance();
+        RealmResults<Diary> diaries = mRealm.where(Diary.class).findAll();
+        for (Iterator<Diary> i = diaries.iterator(); i.hasNext(); ) {
+            Diary d = i.next();
+            byte[] bytes = d.image;
+            if (bytes != null && bytes.length > 0) {
+                mImageIds.add(new Long(d.id));
+            }
+        }
 
-        mImageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
+        mContentView.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
             public View makeView() {
                 ImageView imageView = new ImageView(getApplicationContext());
                 imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 imageView.setLayoutParams(new ImageSwitcher.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
 
                 return imageView;
             }
         });
-
-
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String animationType = pref.getString(SLIDESHOW_ANIMATION, FADE_IN_OUT);
-
-
-        // アニメーション効果を設定する。
-        switch (animationType){
-            case FADE_IN_OUT:
-                mImageSwitcher.setInAnimation(this,android.R.anim.fade_in);
-                mImageSwitcher.setOutAnimation(this,android.R.anim.fade_out);
-                break;
-            case SLIDE_IN:
-                mImageSwitcher.setInAnimation(this,android.R.anim.slide_in_left);
-                mImageSwitcher.setOutAnimation(this,android.R.anim.slide_out_right);
-                break;
-            default:
-                mImageSwitcher.clearAnimation();
-                break;
-
-        }
-
-        RealmResults<Diary> diaries = mRealm.where(Diary.class).findAll();
-        for (Iterator<Diary> i = diaries.iterator(); i.hasNext(); ) {
-
-            Diary d = i.next();
-            byte[] bytes = d.getImage();
-            if (bytes != null && bytes.length > 0) {
-                mImageIds.add(new Long(d.getId()));
-            }
-        }
 
         ImageView next = (ImageView) findViewById(R.id.next);
         next.setOnClickListener(new View.OnClickListener() {
@@ -226,11 +218,24 @@ public class SlideshowActivity extends AppCompatActivity {
                 movePositon(-1);
             }
         });
+        movePositon(0);
 
-        Button slideshowButton = (Button) findViewById(R.id.sildeshow_button);
-        slideshowButton.setOnClickListener(new View.OnClickListener() {
+        Animation anim = AnimationUtils
+                .makeInAnimation(this, false);// trueで左から右falseならその逆にアニメーションする
+        anim.setDuration(3000);
+        anim.setInterpolator(this, android.R.anim.bounce_interpolator);
+        mContentView.setInAnimation(anim);
+
+        mContentView.setOutAnimation(this, android.R.anim.fade_out);
+
+        mMediaPlayer = MediaPlayer.create(this, R.raw.getdown);
+        mMediaPlayer.setLooping(true);
+        mMediaPlayer.start();
+
+        Button button = (Button) findViewById(R.id.slideshow_button);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 mIsSlildeshow = !mIsSlildeshow;
                 if (mIsSlildeshow) {
                     mMediaPlayer.start();
@@ -240,12 +245,6 @@ public class SlideshowActivity extends AppCompatActivity {
                 }
             }
         });
-        movePositon(0);
-
-        mMediaPlayer = MediaPlayer.create(this, R.raw.getdown);
-        mMediaPlayer.setLooping(true);
-        mMediaPlayer.start();
-
     }
 
     @Override
@@ -255,8 +254,10 @@ public class SlideshowActivity extends AppCompatActivity {
 
         if(mMediaPlayer != null){
             mMediaPlayer.stop();
+            mMediaPlayer.release();
         }
     }
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -266,6 +267,17 @@ public class SlideshowActivity extends AppCompatActivity {
         // created, to briefly hint to the user that UI controls
         // are available.
         delayedHide(100);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            // This ID represents the Home or Up button.
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void toggle() {
@@ -293,7 +305,7 @@ public class SlideshowActivity extends AppCompatActivity {
     @SuppressLint("InlinedApi")
     private void show() {
         // Show the system bar
-        mImageSwitcher.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         mVisible = true;
 
@@ -311,10 +323,9 @@ public class SlideshowActivity extends AppCompatActivity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-
-    // 画像の変更用メソッド
+    /* 以下追加メソッド */
     private void movePositon(int to) {
-        if (mImageIds.size() == 0){
+        if (mImageIds.size() == 0) {
             return;
         }
 
@@ -326,40 +337,15 @@ public class SlideshowActivity extends AppCompatActivity {
             mPosition = mImageIds.size() - 1;
         }
 
-
         Long id = mImageIds.get(mPosition);
         Diary diary = mRealm.where(Diary.class).equalTo("id", id).findFirst();
         if (diary == null) return;
-        byte[] bytes = diary.getImage();
+        byte[] bytes = diary.image;
         if (bytes != null && bytes.length > 0) {
             Bitmap bitmap = MyUtils.getImageFromByte(bytes);
             Drawable drawable = new BitmapDrawable(getResources(), bitmap);
-            mImageSwitcher.setImageDrawable(drawable);
-            setTitle(diary.getTitle());
+            mContentView.setImageDrawable(drawable);
+            setTitle(diary.title);
         }
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String waitTimeStr = pref.getString(SLIDESHOW_WAIT_TIME,"3");
-        int waitTime = Integer.parseInt(waitTimeStr) * 1000;
-
-        mTimer = new Timer();
-        mTimer.schedule(mTimerTask, 0, waitTime);
-        if (mIsSlildeshow)
-            mMediaPlayer.start();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mTimer.cancel();
-
-        mMediaPlayer.pause();
-
-    }
-
-
 }

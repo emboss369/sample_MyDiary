@@ -1,26 +1,41 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/black"
-    tools:context="org.example.username.mydiary.SlideshowActivity">
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@android:color/black"
+             tools:context="com.example.username.mydiary.SlideshowActivity">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
-    <ImageSwitcher
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/image_switcher"
-        android:layout_gravity="center_vertical|center_horizontal" />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
+    <ImageSwitcher
+        android:id="@+id/image_switcher"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
+
+        <ImageView
+            android:id="@+id/prev"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:tint="@android:color/white"
+            app:srcCompat="@drawable/ic_chevron_left"/>
+
+        <ImageView
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:tint="@android:color/white"
+            app:srcCompat="@drawable/ic_chevron_right"/>
 
         <LinearLayout
             android:id="@+id/fullscreen_content_controls"
@@ -33,34 +48,15 @@
             tools:ignore="UselessParent">
 
             <Button
-                android:id="@+id/sildeshow_button"
+                android:id="@+id/slideshow_button"
                 style="?metaButtonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/start_slideshow" />
+                android:text="@string/slideshow"/>
 
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:srcCompat="@drawable/ic_chevron_right"
-            android:id="@+id/next"
-            android:tint="?attr/colorAccent"
-            android:layout_gravity="end|center_vertical"
-            android:padding="8dp"
-            android:contentDescription="@string/image_description" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:srcCompat="@drawable/ic_chevron_left"
-            android:id="@+id/prev"
-            android:tint="?attr/colorAccent"
-            android:layout_gravity="start|center_vertical"
-            android:padding="8dp"
-            android:contentDescription="@string/image_description" />
     </FrameLayout>
 
 </FrameLayout>

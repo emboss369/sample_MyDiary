@@ -1,9 +1,9 @@
-package org.example.username.mydiary;
-
+package com.example.username.mydiary;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,14 +19,10 @@ import io.realm.RealmResults;
 
 
 public class DiaryListFragment extends Fragment {
-    private Realm mRealm;
 
     private OnFragmentInteractionListener mListener;
 
-    public interface OnFragmentInteractionListener {
-        void onAddDiarySelected();
-    }
-
+    private Realm mRealm;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,32 +36,18 @@ public class DiaryListFragment extends Fragment {
         mRealm.close();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setHasOptionsMenu(true);
+    public DiaryListFragment() {
+    }
+
+    public static DiaryListFragment newInstance() {
+        DiaryListFragment fragment = new DiaryListFragment();
+        return fragment;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_diary_list, container, false);
-        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.recycler);
-
-        // recyclerView.setHasFixedSize(true);
-
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-
-        recyclerView.setLayoutManager(llm);
-
-        RealmResults<Diary> diaries = mRealm.where(Diary.class).findAll();
-        DiaryRealmAdapter adapter = new DiaryRealmAdapter(getActivity(), diaries, true);
-
-        recyclerView.setAdapter(adapter);
-
-        return v;
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -75,11 +57,9 @@ public class DiaryListFragment extends Fragment {
         MenuItem addDiary = menu.findItem(R.id.menu_item_add_diary);
         MenuItem deleteAll = menu.findItem(R.id.menu_item_delete_all);
         MenuItem slideShow = menu.findItem(R.id.menu_item_slide_show);
-        MenuItem itemSetting = menu.findItem(R.id.menu_item_setting);
-        MyUtils.tintMenuIcon(getContext(),addDiary,R.color.color_menu_icon);
-        MyUtils.tintMenuIcon(getContext(),deleteAll,R.color.color_menu_icon);
-        MyUtils.tintMenuIcon(getContext(),slideShow,R.color.color_menu_icon);
-        MyUtils.tintMenuIcon(getContext(),itemSetting,R.color.color_menu_icon);
+        MyUtils.tintMenuIcon(getContext(), addDiary, android.R.color.white);
+        MyUtils.tintMenuIcon(getContext(), deleteAll, android.R.color.white);
+        MyUtils.tintMenuIcon(getContext(), slideShow, android.R.color.white);
     }
 
     @Override
@@ -104,13 +84,32 @@ public class DiaryListFragment extends Fragment {
                 startActivity(intent);
                 return true;
             }
-            case R.id.menu_item_setting: {
-                Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                startActivity(intent);
-                return true;
-            }
         }
         return false;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_diary_list, container, false);
+        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.recycler);
+
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+
+        recyclerView.setLayoutManager(llm);
+
+//        GridLayoutManager glm = new GridLayoutManager(getActivity(), 2);
+//        recyclerView.setLayoutManager(glm);
+
+        RealmResults<Diary> diaries = mRealm.where(Diary.class).findAll();
+        DiaryRealmAdapter adapter =
+                new DiaryRealmAdapter(getActivity(), diaries, true);
+
+        recyclerView.setAdapter(adapter);
+
+
+        return v;
     }
 
     @Override
@@ -128,5 +127,9 @@ public class DiaryListFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public interface OnFragmentInteractionListener {
+        void onAddDiarySelected();
     }
 }

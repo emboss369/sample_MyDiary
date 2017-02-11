@@ -1,4 +1,4 @@
-package org.example.username.mydiary;
+package com.example.username.mydiary;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -15,16 +15,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Created by user.name on 2017/01/30.
+ */
 
 public class MyUtils {
-
-    // ビットマップをバイト配列に変換します
-    public static byte[] getByteFromImage(Bitmap bmp){
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        return byteArray;
-    }
 
     // バイト配列をビットマップに変換します
     public static Bitmap getImageFromByte(byte[] bytes) {
@@ -47,7 +42,16 @@ public class MyUtils {
         return bmp;
     }
 
-    public static Bitmap getImageFromStream(ContentResolver resolver, Uri uri) throws IOException {
+    // ビットマップをバイト配列に変換します
+    public static byte[] getByteFromImage(Bitmap bmp){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        return byteArray;
+    }
+
+    public static Bitmap getImageFromStream(ContentResolver resolver, Uri uri) throws
+            IOException {
         InputStream in;
 
         // オプションを作成しデータのサイズ確認のみに設定
@@ -57,9 +61,9 @@ public class MyUtils {
         BitmapFactory.decodeStream(in,null,opt);
         in.close();
         int bitmapSize = 1;
-        if((opt.outHeight * opt.outWidth) > 100000) {
-            //10万ピクセル以上の場合はサイズを小さくして読み込む
-            double outSize = (double) (opt.outHeight * opt.outWidth) / 100000;
+        if((opt.outHeight * opt.outWidth) > 500000) {
+            //50万ピクセル以上の場合はサイズを小さくして読み込む
+            double outSize = (double) (opt.outHeight * opt.outWidth) / 500000;
             bitmapSize = (int)(Math.sqrt(outSize) + 1);
         }
 
@@ -70,13 +74,14 @@ public class MyUtils {
         Bitmap bmp = BitmapFactory.decodeStream(in,null,opt);
         in.close();
         return bmp;
-
     }
-
-    public static void tintMenuIcon(Context context, MenuItem item, @ColorRes int color) {
+    public static void tintMenuIcon(Context context, MenuItem item,
+                                    @ColorRes int color) {
         Drawable normalDrawable = item.getIcon();
         Drawable wrapDrawable = DrawableCompat.wrap(normalDrawable);
-        DrawableCompat.setTint(wrapDrawable, ContextCompat.getColor(context, color));
+        DrawableCompat.setTint(wrapDrawable,
+                ContextCompat.getColor(context, color));
         item.setIcon(wrapDrawable);
     }
+
 }

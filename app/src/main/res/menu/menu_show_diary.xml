@@ -1,11 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="org.example.username.mydiary.ShowDiaryActivity">
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.example.username.mydiary.ShowDiaryActivity">
     <item
-        android:id="@+id/menu_item_share"
+        android:id="@+id/action_settings"
         android:orderInCategory="100"
-        android:title="@string/share"
-        app:showAsAction="never"
-        app:actionProviderClass="android.support.v7.widget.ShareActionProvider" />
+        android:title="@string/action_settings"
+        app:showAsAction="never"/>
 </menu>
