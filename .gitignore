@@ -7,4 +7,33 @@
 /build
 /captures
 .externalNativeBuild
+
 *.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+
+local.properties
+.classpath
+.project
+proguard/
+*.ipr
+*.iws
+app/build/
+
+.idea/*.xml
+
+!.idea/gradle.xml
+!.idea/runConfigurations/*.xml
+
+ehthumbs.db
+Thumbs.db
+
+# Signing files
+.signing/
+
+# Keystore files
+*.jks

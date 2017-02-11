@@ -348,6 +348,8 @@ public class SlideshowActivity extends AppCompatActivity {
 
         mTimer = new Timer();
         mTimer.schedule(mTimerTask, 0, waitTime);
+        if (mIsSlildeshow)
+            mMediaPlayer.start();
     }
 
     @Override

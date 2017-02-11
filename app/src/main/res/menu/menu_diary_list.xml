@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="@string/add_diary"
+    <item
         android:id="@+id/menu_item_add_diary"
         android:icon="@drawable/ic_insert_drive_file"
-        app:showAsAction="ifRoom" />
+        android:title="@string/add_diary"
+        app:showAsAction="ifRoom"/>
     <item android:title="@string/delete_all"
         android:id="@+id/menu_item_delete_all"
         android:icon="@drawable/ic_delete"

@@ -141,5 +141,4 @@ public class ShowDiaryActivity extends AppCompatActivity {
         return shareIntent;
     }
 
-
 }

@@ -60,7 +60,6 @@ public class DiaryListFragment extends Fragment {
 
         recyclerView.setLayoutManager(llm);
 
-        mRealm = Realm.getDefaultInstance();
         RealmResults<Diary> diaries = mRealm.where(Diary.class).findAll();
         DiaryRealmAdapter adapter = new DiaryRealmAdapter(getActivity(), diaries, true);
 
@@ -91,7 +90,8 @@ public class DiaryListFragment extends Fragment {
                 if (mListener != null) mListener.onAddDiarySelected();
                 return true;
             case R.id.menu_item_delete_all:
-                final RealmResults<Diary> diaries = mRealm.where(Diary.class).findAll();
+                final RealmResults<Diary> diaries =
+                        mRealm.where(Diary.class).findAll();
                 mRealm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
